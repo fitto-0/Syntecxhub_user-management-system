@@ -7,20 +7,19 @@ const router = express.Router();
 // @route   GET api/users
 // @desc    Get all users (Admin only)
 // @access  Private/Admin
-router.get('/', [auth, isAdmin], async (req, res) => {
+router.get('/', [auth, isAdmin], async (req, res, next) => {
   try {
     const users = await User.find().select('-password');
-    res.json(users);
+    res.json({ success: true, data: users });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    next(err); // Pass errors to the error handling middleware
   }
 });
 
 // @route   GET api/users/:id
 // @desc    Get user by ID
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', auth, async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
     
@@ -33,7 +32,8 @@ router.get('/:id', auth, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
     
-    res.json(user);
+    res.json({ success: true, data: user });
+
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {
@@ -93,7 +93,7 @@ router.put(
       res.json(user);
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Server Error');
+      res.status(500).send('Server error');
     }
   }
 );

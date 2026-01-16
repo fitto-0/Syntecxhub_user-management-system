@@ -7,7 +7,7 @@ const router = express.Router();
 // @route   POST api/auth/register
 // @desc    Register a user
 // @access  Public
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   const { username, email, password } = req.body;
 
   try {
@@ -43,14 +43,14 @@ router.post('/register', async (req, res) => {
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    next(err);
   }
 });
 
 // @route   POST api/auth/login
 // @desc    Login user and get token
 // @access  Public
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -83,20 +83,20 @@ router.post('/login', async (req, res) => {
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    next(err);
   }
 });
 
 // @route   GET api/auth/user
 // @desc    Get current user
 // @access  Private
-router.get('/user', auth, async (req, res) => {
+router.get('/user', auth, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
+     res.json({ success: true, data: user });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    next(err);
   }
 });
 

@@ -24,9 +24,19 @@ app.get('/', (req, res) => {
 });
 
 // Error handling middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error('Error:', err.message);
+  
+  // If headers were already sent, delegate to the default Express error handler
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({
+    message: 'Internal Server Error',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong!'
+  });
 });
 
 const PORT = process.env.PORT || 3000;
@@ -34,9 +44,8 @@ const PORT = process.env.PORT || 3000;
 // Only start the server if we're not in test environment
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`MongoDB connected: ${process.env.MONGODB_URI}`);
-  });
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
 }
 
 module.exports = app; // For testing purposes

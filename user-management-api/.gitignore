@@ -4,6 +4,7 @@ npm-debug.log
 
 # Environment variables
 .env
+.env.example
 
 # Logs
 logs

@@ -1,10 +1,12 @@
+// middleware/auth.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const auth = async (req, res, next) => {
   try {
     // Get token from header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const authHeader = req.get('authorization') || req.get('Authorization');
+    const token = authHeader?.match(/^Bearer\s+(.+)$/i)?.[1]?.trim();
     
     if (!token) {
       return res.status(401).json({ message: 'No token, authorization denied' });
